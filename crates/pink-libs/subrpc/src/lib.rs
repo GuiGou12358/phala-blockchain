@@ -341,12 +341,26 @@ pub fn create_transaction<T: Encode>(
 }
 
 pub fn send_transaction(rpc_node: &str, signed_tx: &[u8]) -> core::result::Result<Vec<u8>, Error> {
+
+    use pink::debug;
+
+    println!("signed_tx: {:02x?}", signed_tx);
+    debug!("ssigned_tx: {:02x?}", signed_tx);
+
     let tx_hex = hex::encode(signed_tx);
+
+    println!("tx_hex: {:02x?}", tx_hex);
+    debug!("ttx_hex: {:02x?}", tx_hex);
+
     let data = format!(
         r#"{{"id":1,"jsonrpc":"2.0","method":"author_submitExtrinsic","params":["{tx_hex}"]}}"#
     )
     .into_bytes();
     let resp_body = call_rpc(rpc_node, data)?;
+
+    println!("resp_body: {:02x?}", resp_body);
+    debug!("rresp_body: {:02x?}", resp_body);
+
     let resp: TransactionResponse = json::from_slice(&resp_body).or(Err(Error::InvalidBody))?;
 
     hex::decode(&resp.result[2..]).or(Err(Error::InvalidBody))
